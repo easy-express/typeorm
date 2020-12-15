@@ -1,5 +1,6 @@
-import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
 import { DatabaseDialect } from './DatabaseDialect';
+import { createConnection } from 'typeorm';
+import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
 
 export class DatabaseModule implements IEasyExpressAttachableModule {
   private database: string;
@@ -25,7 +26,27 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     this.port = port;
   }
 
-  public attachTo(server: EasyExpressServer): void {
-    throw new Error('Method not implemented.');
+  public attachTo(server: EasyExpressServer): Promise<unknown> {
+    return this.connect();
+  }
+
+  private async connect() {
+    console.log('🔌 Connecting to database...');
+    // refer to https://typeorm.io/#/ to view how to use the connection
+    return createConnection({
+      type: this.dialect,
+      host: this.host,
+      port: this.port,
+      username: this.username,
+      password: this.password,
+      database: this.database,
+    })
+      .then(() => {
+        console.log('✅ Connected to database!');
+      })
+      .catch((e) => {
+        console.error(e);
+        return e;
+      });
   }
 }
