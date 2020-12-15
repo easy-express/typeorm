@@ -8,8 +8,9 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
   private password: string;
   private host: string;
   private dialect: DatabaseDialect;
-  private port?: number;
   private entities: any[];
+  private logging: boolean;
+  private port?: number;
 
   constructor(
     database: string,
@@ -19,6 +20,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     dialect: DatabaseDialect,
     entities: any[],
     port?: number,
+    logging?: boolean,
   ) {
     this.database = database;
     this.username = username;
@@ -27,6 +29,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     this.dialect = dialect;
     this.port = port;
     this.entities = entities;
+    this.logging = logging !== undefined ? logging : false;
   }
 
   public attachTo(server: EasyExpressServer): Promise<unknown> {
@@ -44,6 +47,8 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       password: this.password,
       database: this.database,
       entities: this.entities,
+      synchronize: true,
+      logging: this.logging,
     })
       .then(() => {
         console.log('💡 Connected to database!');
