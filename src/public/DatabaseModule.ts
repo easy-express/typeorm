@@ -9,6 +9,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
   private host: string;
   private dialect: DatabaseDialect;
   private port?: number;
+  private entities: any[];
 
   constructor(
     database: string,
@@ -16,6 +17,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     password: string,
     host: string,
     dialect: DatabaseDialect,
+    entities: any[],
     port?: number,
   ) {
     this.database = database;
@@ -24,6 +26,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     this.host = host;
     this.dialect = dialect;
     this.port = port;
+    this.entities = entities;
   }
 
   public attachTo(server: EasyExpressServer): Promise<unknown> {
@@ -40,9 +43,10 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       username: this.username,
       password: this.password,
       database: this.database,
+      entities: this.entities,
     })
       .then(() => {
-        console.log('✅ Connected to database!');
+        console.log('💡 Connected to database!');
       })
       .catch((e) => {
         console.error(e);

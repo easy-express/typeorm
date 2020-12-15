@@ -8,23 +8,43 @@
   </a>
 </p>
 
-> A module to implement DB functionality for an Easy-Express Server.
+> A module that implements TypeORM to let you easily connect and manage your database in conjunctionw with an Easy-Express Server.
 
 ### 🏠 [Homepage](https://github.com/leonardparisi/easy-express-server#readme)
 
 ## Introduction
 
-....
+This module does not require much interaction. You simply create it and attach it to your server, and your TypeORM connection is set!
 
 ## Install
 
 ```sh
-npm install @easy-express/sequelize
+npm install @easy-express/db
+```
+
+## Model generation
+
+```sh
+npx typeorm-model-generator -h HOST -d DATABASE -u USER -x PASSWORD -p PORT -e DB_DIALECT -o OUTPUT_DIR
 ```
 
 ## Usage
 
-Note: You must put all sequelize models inside ./src/database_models
+First, generate the models for TypeORM using the command above. Once they're generated, you can create a new DatabaseModule and attach it to your Easy-Express Server to connect it to the database. Once that's done, you can use [TypeORM](https://typeorm.io/#/) as one normally would.
+
+Also, you need to add the following compiler options to your tsconfig.json:
+
+```json
+{
+  "compilerOptions": {
+    // ...
+    "strictPropertyInitialization": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+    // ...
+  }
+}
+```
 
 ### Example
 
