@@ -3,31 +3,10 @@ import { createConnection } from 'typeorm';
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
 
 export class DatabaseModule implements IEasyExpressAttachableModule {
-  private database: string;
-  private username: string;
-  private password: string;
-  private host: string;
-  private dialect: DatabaseDialect;
   private entities: any[];
   private logging: boolean;
-  private port?: number;
 
-  constructor(
-    database: string,
-    username: string,
-    password: string,
-    host: string,
-    dialect: DatabaseDialect,
-    entities: any[],
-    port?: number,
-    logging?: boolean,
-  ) {
-    this.database = database;
-    this.username = username;
-    this.password = password;
-    this.host = host;
-    this.dialect = dialect;
-    this.port = port;
+  constructor(entities: any[], logging?: boolean) {
     this.entities = entities;
     this.logging = logging !== undefined ? logging : false;
   }
@@ -37,18 +16,17 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
   }
 
   private async connect() {
-    console.log('🔌 Connecting to database...');
     // refer to https://typeorm.io/#/ to view how to use the connection
     return createConnection({
-      type: this.dialect,
-      host: this.host,
-      port: this.port,
-      username: this.username,
-      password: this.password,
-      database: this.database,
+      host: process.env.DB_HOST!,
+      database: process.env.DB_NAME!,
+      port: Number(process.env.DB_PORT),
+      type: <DatabaseDialect>process.env.DB_DIALECT!,
+      username: process.env.DB_USER!,
+      password: process.env.DB_PASSWD!,
       entities: this.entities,
-      synchronize: true,
       logging: this.logging,
+      synchronize: true,
     })
       .then(() => {
         console.log('💡 Connected to database!');

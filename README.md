@@ -22,17 +22,22 @@ This module does not require much interaction. You simply create it and attach i
 npm install @easy-express/db
 ```
 
-## Model generation
+## Setup
+
+First, add the following environment variables (you can use a .env file):
 
 ```sh
-npx typeorm-model-generator -h HOST -d DATABASE -u USER -x PASSWORD -p PORT -e DB_DIALECT -o OUTPUT_DIR
+DB_HOST='HOST'
+DB_NAME='DATABASE_NAME'
+DB_PORT=DATABASE_PORT
+DB_USER=DATABASE_USERNAME
+DB_PASSWD=DATABASE_PASSWORD
+DB_DIALECT= 'mysql' | 'mssql' | 'sqlite' | 'postgres' | 'mariadb' | 'mongodb' (fill in the one you are using)
 ```
 
-## Usage
+Next, run the `generate_entities.sh` script to generate the entities from your database using the credentials from your .env file. The entities will be placed into your src directory.
 
-First, generate the models for TypeORM using the command above. Once they're generated, you can create a new DatabaseModule and attach it to your Easy-Express Server to connect it to the database. Once that's done, you can use [TypeORM](https://typeorm.io/#/) as one normally would.
-
-Also, you need to add the following compiler options to your tsconfig.json:
+Finally, add the following compiler options to your tsconfig.json:
 
 ```json
 {
@@ -45,6 +50,10 @@ Also, you need to add the following compiler options to your tsconfig.json:
   }
 }
 ```
+
+## Usage
+
+Once you've completed the setup above, you can create a new DatabaseModule and attach it to your Easy-Express Server. Once that's done, you can use [TypeORM](https://typeorm.io/#/) as one normally would.
 
 ### Example
 
