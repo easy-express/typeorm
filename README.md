@@ -57,23 +57,44 @@ Once you've completed the setup above, you can create a new DatabaseModule and a
 
 ### Example
 
-    import { EasyExpressServer } from  "@easy-express/server";
+```ts
+import { EasyExpressServer } from '@easy-express/server';
+import { DatabaseModule } from '@easy-express/db';
+import * as dotenv from 'dotenv';
+import { getRepository } from 'typeorm';
+import { Balances } from './entities/Balances';
+// load env vars from .env file
+dotenv.config();
 
-    // Create a new server
+// create a new server
+let server = new EasyExpressServer();
 
-    let  server = new  EasyExpressServer();
+// define routes for your server...
+server.instance.get('/', (req, res) => {
+  res.send('Hello World!');
+});
 
-    // Define a 'get' route
-
-    server.instance.get("/", (req, res) => {
-
-    res.send("Hello World!");
-
+// example of a route getting data from database using TypeORM
+server.instance.get('/balances', async (req, res) => {
+  return getRepository(Balances)
+    .find()
+    .then((result) => {
+      res.send(result);
     });
+});
 
-    // Start the server
-
+// attach a new database module to the server
+server
+  .attachModule(new DatabaseModule([Balances]))
+  .then(() => {
+    // Start the server after you've attached the database module
     server.start();
+  })
+  .catch((e) => {
+    console.error(e);
+    return e;
+  });
+```
 
 ## Modules
 
