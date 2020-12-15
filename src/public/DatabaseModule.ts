@@ -21,7 +21,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       host: process.env.DB_HOST!,
       database: process.env.DB_NAME!,
       port: Number(process.env.DB_PORT),
-      type: <DatabaseDialect>process.env.DB_DIALECT!,
+      type: process.env.DB_DIALECT! as DatabaseDialect,
       username: process.env.DB_USER!,
       password: process.env.DB_PASSWD!,
       entities: this.entities,
