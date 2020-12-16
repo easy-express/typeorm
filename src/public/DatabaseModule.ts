@@ -31,7 +31,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       synchronize: true,
     })
       .then(() => {
-        console.log('💡 Connected to database!');
+        console.log('💡 Connected to database');
       })
       .catch((e) => {
         console.error(e);
