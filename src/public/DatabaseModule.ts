@@ -27,7 +27,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
 
         for (const filename of filenames) {
           const entity = await import(this.pathToEntities + filename);
-          entities.push(entity);
+          entities.push(Object.values(entity)[0]);
         }
 
         resolve(entities);
