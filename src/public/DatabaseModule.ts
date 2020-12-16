@@ -19,15 +19,14 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
   private async getEntities() {
     return new Promise((resolve, reject) => {
       fs.readdir(this.pathToEntities, async (err, filenames) => {
-        let entities: any[] = [];
+        const entities: any[] = [];
 
         if (err) {
           reject(err.message);
         }
 
-        for (let i = 0; i < filenames.length; i++) {
-          let filename = filenames[i];
-          let entity = await import(this.pathToEntities + filename);
+        for (const filename of filenames) {
+          const entity = await import(this.pathToEntities + filename);
           entities.push(entity);
         }
 
@@ -37,7 +36,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
   }
 
   private async connect() {
-    let entities: any = await this.getEntities();
+    const entities: any = await this.getEntities();
     // refer to https://typeorm.io/#/ to view how to use the connection
     return createConnection({
       host: process.env.DB_HOST!,
@@ -46,7 +45,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       type: process.env.DB_DIALECT! as DatabaseDialect,
       username: process.env.DB_USER!,
       password: process.env.DB_PASSWD!,
-      entities: entities,
+      entities,
       logging: this.logging,
       synchronize: true,
     })
