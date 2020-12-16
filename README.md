@@ -107,7 +107,7 @@ server
 
 - Website: leonardparisi.com
 - Github: [@leonardparisi](https://github.com/leonardparisi)
-- LinkedIn: [@https:\/\/www.linkedin.com\/in\/lenny-parisi\/](https://linkedin.com/in/https://www.linkedin.com/in/lenny-parisi/)
+- LinkedIn: [@https:\/\/www.linkedin.com\/in\/lenny-parisi\/](https://linkedin.com/in/lenny-parisi/)
 
 ## 🤝 Contributing
 
@@ -116,6 +116,8 @@ Contributions, issues and feature requests are welcome!<br />Feel free to check 
 ## Show your support
 
 Give a ⭐️ if this project helped you!
+
+Bitcoin Wallet Address: 3PjDkxNznkx7HVmVdfSMYgGJeeJzoDH7e6
 
 ---
 

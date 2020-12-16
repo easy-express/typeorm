@@ -1,13 +1,14 @@
 import { DatabaseDialect } from './DatabaseDialect';
 import { createConnection } from 'typeorm';
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
+import fs from 'fs';
 
 export class DatabaseModule implements IEasyExpressAttachableModule {
-  private entities: any[];
+  private pathToEntities: string;
   private logging: boolean;
 
-  constructor(entities: any[], logging?: boolean) {
-    this.entities = entities;
+  constructor(pathToEntities: string, logging?: boolean) {
+    this.pathToEntities = pathToEntities;
     this.logging = logging !== undefined ? logging : false;
   }
 
@@ -15,7 +16,28 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     return this.connect();
   }
 
+  private async getEntities() {
+    return new Promise((resolve, reject) => {
+      fs.readdir(this.pathToEntities, async (err, filenames) => {
+        let entities: any[] = [];
+
+        if (err) {
+          reject(err.message);
+        }
+
+        for (let i = 0; i < filenames.length; i++) {
+          let filename = filenames[i];
+          let entity = await import(this.pathToEntities + filename);
+          entities.push(entity);
+        }
+
+        resolve(entities);
+      });
+    });
+  }
+
   private async connect() {
+    let entities: any = await this.getEntities();
     // refer to https://typeorm.io/#/ to view how to use the connection
     return createConnection({
       host: process.env.DB_HOST!,
@@ -24,7 +46,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       type: process.env.DB_DIALECT! as DatabaseDialect,
       username: process.env.DB_USER!,
       password: process.env.DB_PASSWD!,
-      entities: this.entities,
+      entities: entities,
       logging: this.logging,
       synchronize: true,
     })
