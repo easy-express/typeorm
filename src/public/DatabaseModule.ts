@@ -41,6 +41,9 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
    */
   public async connect() {
     const entities: any = await this.loadFiles<any>(this.pathToEntities);
+
+    this.verifyAllInputs();
+
     // refer to https://typeorm.io/#/ to view how to use the connection
     return createConnection({
       host: process.env.DB_HOST!,
@@ -60,6 +63,26 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
         console.error(e);
         return e;
       });
+  }
+
+  private verifyAllInputs() {
+    if (process.env.DB_HOST === undefined) {
+      throw new Error("Environment variable 'DB_HOST' was undefined.");
+    } else if (process.env.DB_NAME === undefined) {
+      throw new Error("Environment variable 'DB_NAME' was undefined.");
+    } else if (process.env.DB_PORT === undefined) {
+      throw new Error("Environment variable 'DB_PORT' was undefined.");
+    } else if (process.env.DB_DIALECT === undefined) {
+      throw new Error("Environment variable 'DB_DIALECT' was undefined.");
+    } else if (process.env.DB_USER === undefined) {
+      throw new Error("Environment variable 'DB_USER' was undefined.");
+    } else if (process.env.DB_PASSWD === undefined) {
+      throw new Error("Environment variable 'DB_PASSWD' was undefined.");
+    }
+
+    if (isNaN(Number(process.env.DB_PORT))) {
+      throw new Error("Environment variable 'DB_PORT' was not a number.");
+    }
   }
 
   /**
