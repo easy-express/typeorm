@@ -20,11 +20,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:leonardparisi/easy-express-typeorm.git"
+    "url": "git+ssh://git@github.com:easy-express/typeorm.git"
   },
   "keywords": [
     "express",
-    "typescript"
+    "typescript",
+    "typeorm"
   ],
   "author": "Leonard Parisi",
   "license": "MIT",
