@@ -1,7 +1,7 @@
 <h1 align="center">Welcome to Easy-Express's TypeORM Module 👋</h1>
 <p>
-  <a href="https://www.npmjs.com/package/@easy-express/db" target="_blank">
-    <img alt="Version" src="https://img.shields.io/npm/v/@easy-express/db.svg">
+  <a href="https://www.npmjs.com/package/@easy-express/typeorm" target="_blank">
+    <img alt="Version" src="https://img.shields.io/npm/v/@easy-express/typeorm.svg">
   </a>
   <a href="#" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
@@ -19,7 +19,7 @@ To start using TypeORM's awesome capabilities, simply attach a DatabaseModule to
 ## Install
 
 ```sh
-npm install @easy-express/db
+npm install @easy-express/typeorm
 ```
 
 ## Setup
@@ -60,7 +60,7 @@ Create a new `DatabaseModule` and pass it a path to the directory containing all
 
 ```ts
 import { EasyExpressServer } from '@easy-express/server';
-import { DatabaseModule } from '@easy-express/db';
+import { DatabaseModule } from '@easy-express/typeorm';
 import * as dotenv from 'dotenv';
 import { getRepository } from 'typeorm';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@easy-express/db",
+  "name": "@easy-express/typeorm",
   "version": "1.0.9",
   "description": "An Easy-Express module that brings all of the functionality of TypeORM.",
   "main": "lib/index.js",
@@ -20,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:leonardparisi/easy-express-db.git"
+    "url": "git+ssh://git@github.com:leonardparisi/easy-express-typeorm.git"
   },
   "keywords": [
     "express",
