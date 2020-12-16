@@ -16,27 +16,8 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     return this.connect();
   }
 
-  private async getEntities() {
-    return new Promise((resolve, reject) => {
-      fs.readdir(this.pathToEntities, async (err, filenames) => {
-        const entities: any[] = [];
-
-        if (err) {
-          reject(err.message);
-        }
-
-        for (const filename of filenames) {
-          const entity = await import(this.pathToEntities + filename);
-          entities.push(Object.values(entity)[0]);
-        }
-
-        resolve(entities);
-      });
-    });
-  }
-
   private async connect() {
-    const entities: any = await this.getEntities();
+    const entities: any = await this.loadFiles<any>(this.pathToEntities);
     // refer to https://typeorm.io/#/ to view how to use the connection
     return createConnection({
       host: process.env.DB_HOST!,
@@ -56,5 +37,24 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
         console.error(e);
         return e;
       });
+  }
+
+  private async loadFiles<T>(path: string): Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      fs.readdir(path, async (err, filenames) => {
+        const typeDefs: T[] = [];
+
+        if (err) {
+          reject(err.message);
+        }
+
+        for (const filename of filenames) {
+          const entity = await import(path + filename);
+          typeDefs.push(Object.values(entity)[0] as T);
+        }
+
+        resolve(typeDefs);
+      });
+    });
   }
 }
