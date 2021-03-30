@@ -54,7 +54,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       password: process.env.DB_PASSWD!,
       entities,
       logging: this.logging,
-      synchronize: true,
+      synchronize: false,
     })
       .then(() => {
         console.log('💡 TypeORM connected and ready');
