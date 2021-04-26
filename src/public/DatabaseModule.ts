@@ -2,7 +2,6 @@ import { DatabaseDialect } from './DatabaseDialect';
 import { Connection, createConnection } from 'typeorm';
 import type { BaseConnectionOptions } from "typeorm/connection/BaseConnectionOptions";
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
-import fs from 'fs';
 
 type Migrations = BaseConnectionOptions["migrations"];
 
@@ -15,13 +14,13 @@ type Migrations = BaseConnectionOptions["migrations"];
  */
 export class DatabaseModule implements IEasyExpressAttachableModule {
   private pathToEntities: string;
-  private migrations: Migrations
+  private migrations: Migrations;
   private logging: boolean;
 
   /**
    * Constructs a DatabaseModule that will read the TypeORM entities
    * located at the given path.
-   * @param pathToEntities the path to the directory where all TypeORM entities are located in
+   * @param pathToEntities the path to the directory where all TypeORM entities are located in. Supports glob patterns
    * @param logging whether or not you want this module to log all TypeORM operations
    */
   constructor(pathToEntities: string, migrations?: Migrations, logging?: boolean) {
@@ -45,8 +44,6 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
    * at the given directory.
    */
   public async connect(): Promise<Connection> {
-    const entities: any = await this.loadFiles<any>(this.pathToEntities);
-
     this.verifyAllInputs();
 
     // refer to https://typeorm.io/#/ to view how to use the connection
@@ -57,7 +54,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       type: process.env.DB_DIALECT! as DatabaseDialect,
       username: process.env.DB_USER!,
       password: process.env.DB_PASSWD!,
-      entities,
+      entities: [this.pathToEntities],
       logging: this.logging,
       synchronize: false,
       migrations: this.migrations
@@ -89,30 +86,5 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     if (isNaN(Number(process.env.DB_PORT))) {
       throw new Error("Environment variable 'DB_PORT' was not a number.");
     }
-  }
-
-  /**
-   * Loads all files inside a given directory and returns them in a list of
-   * the given type.
-   *
-   * @param path the path to a directory containing the files of type <T>
-   */
-  private async loadFiles<T>(path: string): Promise<T[]> {
-    return new Promise((resolve, reject) => {
-      fs.readdir(path, async (err, filenames) => {
-        const typeDefs: T[] = [];
-
-        if (err) {
-          reject(err.message);
-        }
-
-        for (const filename of filenames) {
-          const entity = await import(path + filename);
-          typeDefs.push(Object.values(entity)[0] as T);
-        }
-
-        resolve(typeDefs);
-      });
-    });
   }
 }
