@@ -1,5 +1,5 @@
 import { DatabaseDialect } from './DatabaseDialect';
-import { createConnection } from 'typeorm';
+import { Connection, createConnection } from 'typeorm';
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
 import fs from 'fs';
 
@@ -31,7 +31,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
    * module use consistent -- it only calls this.connect().
    * @param server the server to 'attach' to (doesn't matter)
    */
-  public attachTo(server: EasyExpressServer): Promise<unknown> {
+  public attachTo(server: EasyExpressServer): Promise<Connection> {
     return this.connect();
   }
 
@@ -39,7 +39,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
    * Connects to the database and initializes TypeORM with the entities
    * at the given directory.
    */
-  public async connect() {
+  public async connect(): Promise<Connection> {
     const entities: any = await this.loadFiles<any>(this.pathToEntities);
 
     this.verifyAllInputs();
