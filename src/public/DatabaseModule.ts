@@ -59,8 +59,9 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       synchronize: false,
       migrations: this.migrations
     })
-      .then(() => {
+      .then((connection) => {
         console.log('💡 TypeORM connected and ready');
+        return connection;
       })
       .catch((e) => {
         console.error(e);
