@@ -1,7 +1,10 @@
 import { DatabaseDialect } from './DatabaseDialect';
 import { Connection, createConnection } from 'typeorm';
+import type { BaseConnectionOptions } from "typeorm/connection/BaseConnectionOptions";
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
 import fs from 'fs';
+
+type Migrations = BaseConnectionOptions["migrations"];
 
 /**
  * A database module connects to the database using the environment variable credentials and
@@ -12,17 +15,19 @@ import fs from 'fs';
  */
 export class DatabaseModule implements IEasyExpressAttachableModule {
   private pathToEntities: string;
+  private migrations: Migrations
   private logging: boolean;
 
   /**
    * Constructs a DatabaseModule that will read the TypeORM entities
    * located at the given path.
    * @param pathToEntities the path to the directory where all TypeORM entities are located in
-   * @param logging wherther or not you want this module to log all TypeORM operations
+   * @param logging whether or not you want this module to log all TypeORM operations
    */
-  constructor(pathToEntities: string, logging?: boolean) {
+  constructor(pathToEntities: string, migrations?: Migrations, logging?: boolean) {
     this.pathToEntities = pathToEntities;
-    this.logging = logging !== undefined ? logging : false;
+    this.migrations = migrations;
+    this.logging = logging ?? false;
   }
 
   /**
@@ -55,7 +60,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       entities,
       logging: this.logging,
       synchronize: false,
-      migrations: process.env.MIGRATION_FILES ? [process.env.MIGRATION_FILES] : []
+      migrations: this.migrations
     })
       .then(() => {
         console.log('💡 TypeORM connected and ready');
