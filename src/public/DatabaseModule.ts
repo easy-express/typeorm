@@ -55,6 +55,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       entities,
       logging: this.logging,
       synchronize: false,
+      migrations: process.env.MIGRATION_FILES ? [process.env.MIGRATION_FILES] : []
     })
       .then(() => {
         console.log('💡 TypeORM connected and ready');
