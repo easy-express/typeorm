@@ -1,7 +1,9 @@
-import { DatabaseDialect } from './DatabaseDialect';
-import { createConnection } from 'typeorm';
+import { DatabaseDialect, isDatabaseDialect } from './DatabaseDialect';
+import { Connection, createConnection } from 'typeorm';
+import type { BaseConnectionOptions } from "typeorm/connection/BaseConnectionOptions";
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
-import fs from 'fs';
+
+type Migrations = BaseConnectionOptions["migrations"];
 
 /**
  * A database module connects to the database using the environment variable credentials and
@@ -12,17 +14,19 @@ import fs from 'fs';
  */
 export class DatabaseModule implements IEasyExpressAttachableModule {
   private pathToEntities: string;
+  private migrations: Migrations;
   private logging: boolean;
 
   /**
    * Constructs a DatabaseModule that will read the TypeORM entities
    * located at the given path.
-   * @param pathToEntities the path to the directory where all TypeORM entities are located in
-   * @param logging wherther or not you want this module to log all TypeORM operations
+   * @param pathToEntities the path to the directory where all TypeORM entities are located in. Supports glob patterns
+   * @param logging whether or not you want this module to log all TypeORM operations
    */
-  constructor(pathToEntities: string, logging?: boolean) {
+  constructor(pathToEntities: string, migrations?: Migrations, logging?: boolean) {
     this.pathToEntities = pathToEntities;
-    this.logging = logging !== undefined ? logging : false;
+    this.migrations = migrations;
+    this.logging = logging ?? false;
   }
 
   /**
@@ -31,7 +35,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
    * module use consistent -- it only calls this.connect().
    * @param server the server to 'attach' to (doesn't matter)
    */
-  public attachTo(server: EasyExpressServer): Promise<unknown> {
+  public attachTo(server: EasyExpressServer): Promise<Connection> {
     return this.connect();
   }
 
@@ -39,9 +43,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
    * Connects to the database and initializes TypeORM with the entities
    * at the given directory.
    */
-  public async connect() {
-    const entities: any = await this.loadFiles<any>(this.pathToEntities);
-
+  public async connect(): Promise<Connection> {
     this.verifyAllInputs();
 
     // refer to https://typeorm.io/#/ to view how to use the connection
@@ -52,12 +54,14 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       type: process.env.DB_DIALECT! as DatabaseDialect,
       username: process.env.DB_USER!,
       password: process.env.DB_PASSWD!,
-      entities,
+      entities: [this.pathToEntities],
       logging: this.logging,
       synchronize: false,
+      migrations: this.migrations
     })
-      .then(() => {
+      .then((connection) => {
         console.log('💡 TypeORM connected and ready');
+        return connection;
       })
       .catch((e) => {
         console.error(e);
@@ -67,46 +71,23 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
 
   private verifyAllInputs() {
     if (process.env.DB_HOST === undefined) {
-      throw new Error("Environment variable 'DB_HOST' was undefined.");
+      throw new Error("Environment variable 'DB_HOST' is undefined.");
     } else if (process.env.DB_NAME === undefined) {
-      throw new Error("Environment variable 'DB_NAME' was undefined.");
+      throw new Error("Environment variable 'DB_NAME' is undefined.");
     } else if (process.env.DB_PORT === undefined) {
-      throw new Error("Environment variable 'DB_PORT' was undefined.");
+      throw new Error("Environment variable 'DB_PORT' is undefined.");
     } else if (process.env.DB_DIALECT === undefined) {
-      throw new Error("Environment variable 'DB_DIALECT' was undefined.");
+      throw new Error("Environment variable 'DB_DIALECT' is undefined.");
+    } else if (!isDatabaseDialect(process.env.DB_DIALECT)) {
+      throw new Error(`Environment variable 'DB_DIALECT' (value: ${process.env.DB_DIALECT}) is not a valid Database Dialect.`);
     } else if (process.env.DB_USER === undefined) {
-      throw new Error("Environment variable 'DB_USER' was undefined.");
+      throw new Error("Environment variable 'DB_USER' is undefined.");
     } else if (process.env.DB_PASSWD === undefined) {
-      throw new Error("Environment variable 'DB_PASSWD' was undefined.");
+      throw new Error("Environment variable 'DB_PASSWD' is undefined.");
     }
 
     if (isNaN(Number(process.env.DB_PORT))) {
-      throw new Error("Environment variable 'DB_PORT' was not a number.");
+      throw new Error("Environment variable 'DB_PORT' is not a number.");
     }
-  }
-
-  /**
-   * Loads all files inside a given directory and returns them in a list of
-   * the given type.
-   *
-   * @param path the path to a directory containing the files of type <T>
-   */
-  private async loadFiles<T>(path: string): Promise<T[]> {
-    return new Promise((resolve, reject) => {
-      fs.readdir(path, async (err, filenames) => {
-        const typeDefs: T[] = [];
-
-        if (err) {
-          reject(err.message);
-        }
-
-        for (const filename of filenames) {
-          const entity = await import(path + filename);
-          typeDefs.push(Object.values(entity)[0] as T);
-        }
-
-        resolve(typeDefs);
-      });
-    });
   }
 }
