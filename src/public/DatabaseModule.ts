@@ -1,4 +1,4 @@
-import { DatabaseDialect } from './DatabaseDialect';
+import { DatabaseDialect, isDatabaseDialect } from './DatabaseDialect';
 import { Connection, createConnection } from 'typeorm';
 import type { BaseConnectionOptions } from "typeorm/connection/BaseConnectionOptions";
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
@@ -71,21 +71,23 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
 
   private verifyAllInputs() {
     if (process.env.DB_HOST === undefined) {
-      throw new Error("Environment variable 'DB_HOST' was undefined.");
+      throw new Error("Environment variable 'DB_HOST' is undefined.");
     } else if (process.env.DB_NAME === undefined) {
-      throw new Error("Environment variable 'DB_NAME' was undefined.");
+      throw new Error("Environment variable 'DB_NAME' is undefined.");
     } else if (process.env.DB_PORT === undefined) {
-      throw new Error("Environment variable 'DB_PORT' was undefined.");
+      throw new Error("Environment variable 'DB_PORT' is undefined.");
     } else if (process.env.DB_DIALECT === undefined) {
-      throw new Error("Environment variable 'DB_DIALECT' was undefined.");
+      throw new Error("Environment variable 'DB_DIALECT' is undefined.");
+    } else if (!isDatabaseDialect(process.env.DB_DIALECT)) {
+      throw new Error(`Environment variable 'DB_DIALECT' (value: ${process.env.DB_DIALECT}) is not a valid Database Dialect.`);
     } else if (process.env.DB_USER === undefined) {
-      throw new Error("Environment variable 'DB_USER' was undefined.");
+      throw new Error("Environment variable 'DB_USER' is undefined.");
     } else if (process.env.DB_PASSWD === undefined) {
-      throw new Error("Environment variable 'DB_PASSWD' was undefined.");
+      throw new Error("Environment variable 'DB_PASSWD' is undefined.");
     }
 
     if (isNaN(Number(process.env.DB_PORT))) {
-      throw new Error("Environment variable 'DB_PORT' was not a number.");
+      throw new Error("Environment variable 'DB_PORT' is not a number.");
     }
   }
 }
