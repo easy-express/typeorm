@@ -1,9 +1,9 @@
 import { DatabaseDialect, isDatabaseDialect } from './DatabaseDialect';
 import { Connection, createConnection } from 'typeorm';
-import type { BaseConnectionOptions } from "typeorm/connection/BaseConnectionOptions";
+import type { BaseConnectionOptions } from 'typeorm/connection/BaseConnectionOptions';
 import { EasyExpressServer, IEasyExpressAttachableModule } from '@easy-express/server';
 
-type Migrations = BaseConnectionOptions["migrations"];
+type Migrations = BaseConnectionOptions['migrations'];
 
 /**
  * A database module connects to the database using the environment variable credentials and
@@ -57,7 +57,7 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
       entities: [this.pathToEntities],
       logging: this.logging,
       synchronize: false,
-      migrations: this.migrations
+      migrations: this.migrations,
     })
       .then((connection) => {
         console.log('💡 TypeORM connected and ready');
@@ -79,7 +79,9 @@ export class DatabaseModule implements IEasyExpressAttachableModule {
     } else if (process.env.DB_DIALECT === undefined) {
       throw new Error("Environment variable 'DB_DIALECT' is undefined.");
     } else if (!isDatabaseDialect(process.env.DB_DIALECT)) {
-      throw new Error(`Environment variable 'DB_DIALECT' (value: ${process.env.DB_DIALECT}) is not a valid Database Dialect.`);
+      throw new Error(
+        `Environment variable 'DB_DIALECT' (value: ${process.env.DB_DIALECT}) is not a valid Database Dialect.`,
+      );
     } else if (process.env.DB_USER === undefined) {
       throw new Error("Environment variable 'DB_USER' is undefined.");
     } else if (process.env.DB_PASSWD === undefined) {
